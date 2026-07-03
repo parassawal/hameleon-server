@@ -2,6 +2,7 @@ import 'dart:math';
 import 'package:flutter/material.dart' hide Route;
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:shared/constants.dart';
 import '../multiplayer/local_server_manager.dart';
 import 'lobby_screen.dart';
 
@@ -417,7 +418,7 @@ class _MainMenuScreenState extends State<MainMenuScreen>
         builder: (_) => LobbyScreen(
           playerName: name,
           roomCode: null,
-          serverUrl: 'ws://127.0.0.1:8080',
+          serverUrl: 'ws://127.0.0.1:${GameConstants.serverPort}',
         ),
       ),
     );
@@ -446,7 +447,7 @@ class _MainMenuScreenState extends State<MainMenuScreen>
         builder: (_) => LobbyScreen(
           playerName: name,
           roomCode: null,
-          serverUrl: 'ws://$ip:8080',
+          serverUrl: 'ws://$ip:${GameConstants.serverPort}',
         ),
       ),
     );

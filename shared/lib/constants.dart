@@ -36,7 +36,7 @@ class GameConstants {
   static const int seekerSpeedBonus = 25; // bonus for quick finds
 
   // Network
-  static const int serverPort = 443;
+  static const int serverPort = 8080;
   static const String serverHost = 'hameleon-server-production.up.railway.app';
   static const int heartbeatIntervalMs = 5000;
   static const int reconnectDelayMs = 1000;
