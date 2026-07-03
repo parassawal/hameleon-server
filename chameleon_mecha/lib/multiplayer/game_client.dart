@@ -53,7 +53,7 @@ class GameClient {
     try {
       final uri = Uri.parse(_serverUrl);
       _channel = WebSocketChannel.connect(uri);
-      await _channel!.ready;
+      await _channel!.ready.timeout(const Duration(seconds: 5));
       _connected = true;
       _reconnectAttempt = 0;
       _connectionController.add(true);
