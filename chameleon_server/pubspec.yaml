@@ -1,0 +1,11 @@
+name: chameleon_server
+description: Chameleon Mecha game server
+publish_to: none
+version: 1.0.0
+
+environment:
+  sdk: ^3.10.0
+
+dependencies:
+  shared:
+    path: ../shared

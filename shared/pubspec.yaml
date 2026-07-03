@@ -1,0 +1,8 @@
+name: shared
+description: Shared models and protocol for Chameleon Mecha
+version: 1.0.0
+
+environment:
+  sdk: ^3.10.0
+
+dependencies: {}
