@@ -137,16 +137,11 @@ void _handleJoinRoom(PlayerSession session, GameMessage message) {
   GameRoom room;
 
   if (roomCode != null && rooms.containsKey(roomCode.toUpperCase())) {
-    // Join existing room
+    // Join specific room
     room = rooms[roomCode.toUpperCase()]!;
-    if (room.isFull) {
-      session.send(GameMessage.gameErrorMsg(message: 'Room is full'));
-      return;
-    }
-    if (room.state.phase != GamePhase.lobby) {
-      session.send(GameMessage.gameErrorMsg(message: 'Game already in progress'));
-      return;
-    }
+  } else if (roomCode == null && rooms.isNotEmpty) {
+    // Local Wi-Fi optimization: Join the only existing room automatically
+    room = rooms.values.first;
   } else if (roomCode != null && !rooms.containsKey(roomCode.toUpperCase())) {
     session.send(GameMessage.gameErrorMsg(message: 'Room not found'));
     return;
@@ -155,6 +150,15 @@ void _handleJoinRoom(PlayerSession session, GameMessage message) {
     room = GameRoom();
     rooms[room.code] = room;
     print('🏠 Room created: ${room.code}');
+  }
+
+  if (room.isFull) {
+    session.send(GameMessage.gameErrorMsg(message: 'Room is full'));
+    return;
+  }
+  if (room.state.phase != GamePhase.lobby) {
+    session.send(GameMessage.gameErrorMsg(message: 'Game already in progress'));
+    return;
   }
 
   room.addPlayer(session);

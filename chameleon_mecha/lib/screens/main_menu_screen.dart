@@ -441,6 +441,9 @@ class _MainMenuScreenState extends State<MainMenuScreen>
       return;
     }
 
+    // Ensure we don't have a background server running if we are joining someone else
+    LocalServerManager.stopLocalServer();
+
     Navigator.push(
       context,
       MaterialPageRoute(

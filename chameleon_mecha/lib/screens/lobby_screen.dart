@@ -143,6 +143,7 @@ class _LobbyScreenState extends State<LobbyScreen>
           onPressed: () {
             _client.leaveRoom();
             _client.disconnect();
+            LocalServerManager.stopLocalServer();
             Navigator.pop(context);
           },
         ),
