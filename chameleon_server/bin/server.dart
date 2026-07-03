@@ -12,12 +12,16 @@ final Map<String, GameRoom> rooms = {};
 final Map<String, PlayerSession> sessions = {};
 
 void main() async {
+  final port = Platform.environment['PORT'] != null
+      ? int.parse(Platform.environment['PORT']!)
+      : GameConstants.serverPort;
+
   final server = await HttpServer.bind(
     InternetAddress.anyIPv4,
-    GameConstants.serverPort,
+    port,
   );
 
-  print('🦎 Chameleon Mecha Server running on port ${GameConstants.serverPort}');
+  print('🦎 Chameleon Mecha Server running on port $port');
   print('   Waiting for connections...\n');
 
   await for (final request in server) {
