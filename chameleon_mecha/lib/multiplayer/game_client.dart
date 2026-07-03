@@ -35,7 +35,7 @@ class GameClient {
 
   GameClient({String? serverUrl})
       : _serverUrl = serverUrl ??
-            'ws://${_getDefaultHost()}:${GameConstants.serverPort}';
+            '${GameConstants.serverPort == 443 ? 'wss' : 'ws'}://${_getDefaultHost()}${GameConstants.serverPort == 443 || GameConstants.serverPort == 80 ? '' : ':${GameConstants.serverPort}'}';
 
   static String _getDefaultHost() {
     String host = GameConstants.serverHost;
