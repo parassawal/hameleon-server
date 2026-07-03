@@ -1,6 +1,8 @@
 import 'dart:math';
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide Route;
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../multiplayer/local_server_manager.dart';
 import 'lobby_screen.dart';
 
 /// Animated main menu with cyberpunk neon aesthetic.
@@ -165,10 +167,10 @@ class _MainMenuScreenState extends State<MainMenuScreen>
                               curve: const Interval(0.0, 0.6, curve: Curves.easeOutBack),
                             )),
                             child: _buildMenuButton(
-                              label: 'CREATE GAME',
-                              icon: Icons.add_circle_outline,
+                              label: 'HOST LOCAL GAME',
+                              icon: Icons.wifi_tethering,
                               color: Colors.cyanAccent,
-                              onTap: _onCreateGame,
+                              onTap: _onHostGame,
                             ),
                           ),
 
@@ -183,8 +185,8 @@ class _MainMenuScreenState extends State<MainMenuScreen>
                               curve: const Interval(0.2, 0.8, curve: Curves.easeOutBack),
                             )),
                             child: _buildMenuButton(
-                              label: 'JOIN GAME',
-                              icon: Icons.group_add,
+                              label: 'JOIN LOCAL GAME',
+                              icon: Icons.wifi,
                               color: const Color(0xFFFF6B35),
                               onTap: () => setState(() => _showJoinDialog = true),
                             ),
@@ -316,7 +318,7 @@ class _MainMenuScreenState extends State<MainMenuScreen>
       child: Column(
         children: [
           Text(
-            'ENTER ROOM CODE',
+            'ENTER HOST IP',
             style: GoogleFonts.orbitron(
               color: Colors.white70,
               fontSize: 12,
@@ -328,21 +330,18 @@ class _MainMenuScreenState extends State<MainMenuScreen>
             controller: _roomCodeController,
             style: GoogleFonts.orbitron(
               color: Colors.white,
-              fontSize: 24,
-              letterSpacing: 8,
+              fontSize: 18,
+              letterSpacing: 2,
               fontWeight: FontWeight.w700,
             ),
             textAlign: TextAlign.center,
-            textCapitalization: TextCapitalization.characters,
-            maxLength: 4,
             decoration: InputDecoration(
               border: InputBorder.none,
-              counterText: '',
-              hintText: 'XXXX',
+              hintText: '192.168.1.x',
               hintStyle: GoogleFonts.orbitron(
                 color: Colors.white.withValues(alpha: 0.15),
-                fontSize: 24,
-                letterSpacing: 8,
+                fontSize: 18,
+                letterSpacing: 2,
               ),
             ),
           ),
@@ -382,11 +381,32 @@ class _MainMenuScreenState extends State<MainMenuScreen>
     );
   }
 
-  void _onCreateGame() {
+  void _onHostGame() async {
     final name = _nameController.text.trim();
     if (name.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Please enter your name')),
+      );
+      return;
+    }
+
+    // Show loading
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => const Center(child: CircularProgressIndicator()),
+    );
+
+    // Start local server
+    final ip = await LocalServerManager.startLocalServer();
+    if (!mounted) return;
+    
+    // Hide loading
+    Navigator.pop(context);
+
+    if (ip == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Failed to start local server')),
       );
       return;
     }
@@ -397,6 +417,7 @@ class _MainMenuScreenState extends State<MainMenuScreen>
         builder: (_) => LobbyScreen(
           playerName: name,
           roomCode: null,
+          serverUrl: 'ws://127.0.0.1:8080',
         ),
       ),
     );
@@ -404,7 +425,7 @@ class _MainMenuScreenState extends State<MainMenuScreen>
 
   void _onJoinGame() {
     final name = _nameController.text.trim();
-    final code = _roomCodeController.text.trim().toUpperCase();
+    final ip = _roomCodeController.text.trim();
 
     if (name.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -412,9 +433,9 @@ class _MainMenuScreenState extends State<MainMenuScreen>
       );
       return;
     }
-    if (code.length != 4) {
+    if (ip.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Room code must be 4 characters')),
+        const SnackBar(content: Text('Please enter host IP')),
       );
       return;
     }
@@ -424,7 +445,8 @@ class _MainMenuScreenState extends State<MainMenuScreen>
       MaterialPageRoute(
         builder: (_) => LobbyScreen(
           playerName: name,
-          roomCode: code,
+          roomCode: null,
+          serverUrl: 'ws://$ip:8080',
         ),
       ),
     );

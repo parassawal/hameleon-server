@@ -4,17 +4,20 @@ import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../multiplayer/game_client.dart';
 import '../multiplayer/game_state.dart';
+import '../multiplayer/local_server_manager.dart';
 import 'game_screen.dart';
 
 /// Multiplayer lobby — waiting room before the game starts.
 class LobbyScreen extends StatefulWidget {
   final String playerName;
   final String? roomCode;
+  final String? serverUrl;
 
   const LobbyScreen({
     super.key,
     required this.playerName,
     this.roomCode,
+    this.serverUrl,
   });
 
   @override
@@ -36,7 +39,7 @@ class _LobbyScreenState extends State<LobbyScreen>
   @override
   void initState() {
     super.initState();
-    _client = GameClient();
+    _client = GameClient(serverUrl: widget.serverUrl);
     _stateManager = GameStateManager();
 
     _pulseController = AnimationController(
@@ -328,7 +331,7 @@ class _LobbyScreenState extends State<LobbyScreen>
           child: Column(
             children: [
               Text(
-                'ROOM CODE',
+                LocalServerManager.isRunning ? 'HOST IP' : 'ROOM CODE',
                 style: GoogleFonts.orbitron(
                   color: Colors.white38,
                   fontSize: 11,
@@ -340,12 +343,14 @@ class _LobbyScreenState extends State<LobbyScreen>
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    _roomCode ?? '----',
+                    LocalServerManager.isRunning 
+                        ? (LocalServerManager.localIp ?? 'UNKNOWN') 
+                        : (_roomCode ?? '----'),
                     style: GoogleFonts.orbitron(
                       color: Colors.cyanAccent,
-                      fontSize: 36,
+                      fontSize: LocalServerManager.isRunning ? 24 : 36,
                       fontWeight: FontWeight.w900,
-                      letterSpacing: 12,
+                      letterSpacing: LocalServerManager.isRunning ? 2 : 12,
                       shadows: [
                         Shadow(
                           color: Colors.cyanAccent.withValues(alpha: 0.6),

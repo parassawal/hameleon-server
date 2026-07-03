@@ -14,6 +14,8 @@ dependencies:
   google_fonts: ^6.2.1
   shared:
     path: ../shared
+  chameleon_server:
+    path: ../chameleon_server
 
 dev_dependencies:
   flutter_test:
